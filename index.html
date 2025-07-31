@@ -3,62 +3,170 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Calculadora de Cavacos</title>
+  <title>Delta CNC – Calculadora de Feed Rate</title>
   <style>
-    body { background: #e7f1f9; font-family: Arial, sans-serif; color: #333; padding: 20px; }
-    .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .row { display: flex; justify-content: space-between; margin-bottom: 20px; }
-    .col { width: 48%; }
-    label { display: block; margin-bottom: 6px; color: #0055a4; font-weight: bold; }
-    input { width: 100%; padding: 8px; font-size: 16px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 4px; }
-    .result { font-size: 24px; font-weight: bold; color: #0055a4; text-align: center; margin: 20px 0; }
-    .table-responsive { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #f0f8ff; color: #0055a4; }
-    .toggle-btn { display: block; margin: 0 auto 20px; padding: 10px 20px; background: #0055a4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin-top: 40px;
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      color: #004080;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+    }
+    .col {
+      flex: 1;
+      min-width: 280px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #004080;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .result {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0066cc;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .toggle-btn {
+      display: block;
+      margin: 0 auto 30px;
+      padding: 12px 24px;
+      background: #004080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .toggle-btn:hover {
+      background: #0059b3;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 40px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #e8f1fc;
+      color: #004080;
+    }
+    tr:hover {
+      background-color: #f5faff;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+      border-bottom: 1px dotted black;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Calculadora de Cavacos</h1>
+    <h1>Delta CNC – Calculadora de Feed Rate</h1>
     <button id="toggleCalc" class="toggle-btn">Calcular por Avanço</button>
     <div class="row">
       <div class="col" id="colFeed">
         <label>Feed Rate (mm/m)</label>
         <input type="number" id="inputFeed" placeholder="2500" />
-        <label>Fresa Nº de arestas</label>
+        <label>Nº de Arestas de Corte <span class="tooltip">(Z)<span class="tooltiptext">Número de cortes ativos da fresa</span></span></label>
         <input type="number" id="inputArestasFeed" placeholder="2" />
-        <label>Tamanho do cavaco</label>
+        <label>Tamanho do Cavaco <span class="tooltip">(mm)<span class="tooltiptext">Avanço por dente da fresa</span></span></label>
         <input type="number" step="0.01" id="inputCavacoFeed" placeholder="0.33" />
         <div class="result" id="resultRPM">RPM: –</div>
       </div>
       <div class="col" id="colRPM" style="display:none">
         <label>RPM Spindle</label>
         <input type="number" id="inputRPM" placeholder="18000" />
-        <label>Fresa Nº de arestas</label>
+        <label>Nº de Arestas de Corte <span class="tooltip">(Z)<span class="tooltiptext">Número de cortes ativos da fresa</span></span></label>
         <input type="number" id="inputArestasRPM" placeholder="2" />
-        <label>Tamanho do cavaco</label>
+        <label>Tamanho do Cavaco <span class="tooltip">(mm)<span class="tooltiptext">Avanço por dente da fresa</span></span></label>
         <input type="number" step="0.01" id="inputCavacoRPM" placeholder="0.33" />
         <div class="result" id="resultFeed">Feed Rate: –</div>
       </div>
     </div>
 
-    <div style="text-align: center; margin-top: 40px;">
-      <h2>Referência Visual para Preenchimento</h2>
-      <img src="tabela_cavacos_escaneada.png" alt="Tabela Cavacos Escaneada" style="max-width: 100%; height: auto; border: 1px solid #ccc; padding: 10px; background: white;" />
-    </div>
-
     <div class="table-responsive">
+      <h2>Tabela de Cavacos Recomendada</h2>
       <table>
         <thead>
-          <tr><th>Diâmetro da Fresa</th><th>Madeira Dura</th><th>Madeira Macia</th><th>MDF</th><th>Plástico Macio</th><th>Plástico Rígido</th><th>Alumínio</th></tr>
+          <tr>
+            <th>Diâmetro da Fresa</th>
+            <th>Madeira Dura</th>
+            <th>Madeira Macia</th>
+            <th>MDF</th>
+            <th>Plástico Macio</th>
+            <th>Plástico Rígido</th>
+            <th>Alumínio</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td>3 mm</td><td>0.08‑0.13</td><td>0.10‑0.15</td><td>0.10‑0.18</td><td>0.10‑0.15</td><td>0.15‑0.20</td><td>0.05‑0.10</td></tr>
-          <tr><td>6 mm</td><td>0.23‑0.28</td><td>0.28‑0.33</td><td>0.33‑0.41</td><td>0.20‑0.30</td><td>0.25‑0.30</td><td>0.08‑0.15</td></tr>
-          <tr><td>10 mm</td><td>0.38‑0.46</td><td>0.43‑0.51</td><td>0.51‑0.58</td><td>0.20‑0.30</td><td>0.25‑0.30</td><td>0.10‑0.20</td></tr>
-          <tr><td>≥12 mm</td><td>0.48‑0.53</td><td>0.53‑0.58</td><td>0.64‑0.69</td><td>0.25‑0.36</td><td>0.30‑0.41</td><td>0.20‑0.25</td></tr>
+          <tr><td>3 mm</td><td>0.10</td><td>0.12</td><td>0.14</td><td>0.12</td><td>0.16</td><td>0.06</td></tr>
+          <tr><td>4 mm</td><td>0.14</td><td>0.16</td><td>0.18</td><td>0.14</td><td>0.18</td><td>0.08</td></tr>
+          <tr><td>6 mm</td><td>0.25</td><td>0.28</td><td>0.30</td><td>0.22</td><td>0.26</td><td>0.10</td></tr>
+          <tr><td>10 mm</td><td>0.40</td><td>0.45</td><td>0.50</td><td>0.26</td><td>0.30</td><td>0.14</td></tr>
+          <tr><td>≥12 mm</td><td>0.48</td><td>0.52</td><td>0.60</td><td>0.30</td><td>0.36</td><td>0.18</td></tr>
         </tbody>
       </table>
     </div>
